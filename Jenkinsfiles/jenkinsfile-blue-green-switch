@@ -1,0 +1,50 @@
+pipeline {
+    agent any
+
+    parameters {
+        choice(
+            name: 'TARGET_VERSION',
+            choices: ['blue', 'green'],
+            description: 'Choose which TARGET_VERSION you need blue or green  to apply'
+        )
+    }
+
+    environment {
+        GCLOUD_PROJECT = 'custom-sun-468208-s1'
+        GCP_REGION = 'asia-east2-a'
+        GKE_CLUSTER = 'gke-private-cluster'
+    }
+
+    stages {
+        stage('Authenticate with GCP') {
+            steps {
+                withCredentials([file(credentialsId: 'test', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                    sh '''
+                        gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
+                        gcloud config set project $GCLOUD_PROJECT
+                        gcloud container clusters get-credentials $GKE_CLUSTER --region $GCP_REGION
+                    '''
+                }
+            }
+        }
+
+        stage('Switch LoadBalancer') {
+            steps {
+                script {
+                    sh """
+                    kubectl patch svc my-app-service \
+                      -p '{"spec": {"selector": {"app": "my-app", "version": "${params.TARGET_VERSION}"}}}'
+                    """
+                }
+            }
+        }
+    }
+    post {
+        success {
+            echo "Blue-Green deployment to '${params.TARGET_VERSION}' was successful!"
+        }
+        failure {
+            echo "Deployment failed!"
+        }
+    }
+}
