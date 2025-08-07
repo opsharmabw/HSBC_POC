@@ -12,7 +12,7 @@ spec:
     metadata:
       labels:
         app: my-app
-        version: v2
+        version: green
     spec:
       containers:
         - name: nginx
