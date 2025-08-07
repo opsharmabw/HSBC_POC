@@ -4,6 +4,8 @@ pipeline {
   parameters {
     choice(name: 'TF_ACTION', choices: ['plan', 'apply', 'destroy'], description: 'Terraform action to perform')
     string(name: 'TF_VARS_FILE', defaultValue: 'variables.tfvars', description: 'Terraform variable file (e.g., dev.tfvars, prod.tfvars)')
+    string(name: 'TF_BACKEND_BUCKET', defaultValue: 'my-gke-terraform-state', description: 'GCS bucket for backend')
+
   }
 
   environment {
