@@ -4,4 +4,4 @@ metadata:
   name: version1-html
 data:
   index.html: |
-    <html><body><h1>Version 1</h1></body></html>
+    <html><body><h1>Version 1 blue deployment</h1></body></html>
