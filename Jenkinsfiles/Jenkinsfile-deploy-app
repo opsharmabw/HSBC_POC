@@ -1,0 +1,45 @@
+pipeline {
+    agent any
+
+    parameters {
+        choice(
+            name: 'K8S_ACTION',
+            choices: ['apply', 'delete'],
+            description: 'Choose whether to apply or delete the Kubernetes resources'
+        )
+    }
+
+    environment {
+        GCLOUD_PROJECT = 'custom-sun-468208-s1'
+        GCP_REGION = 'asia-east2-a'
+        GKE_CLUSTER = 'gke-private-cluster'
+    }
+
+    stages {
+        stage('Authenticate with GCP') {
+            steps {
+                withCredentials([file(credentialsId: 'test', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                    sh '''
+                        gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
+                        gcloud config set project $GCLOUD_PROJECT
+                        gcloud container clusters get-credentials $GKE_CLUSTER --region $GCP_REGION
+                    '''
+                }
+            }
+        }
+
+        stage('Execute kubectl command') {
+            steps {
+                script {
+                    if (params.K8S_ACTION == 'apply') {
+                        sh 'kubectl apply -f ./blue-green-deployment/'
+                    } else if (params.K8S_ACTION == 'delete') {
+                        sh 'kubectl delete -f ./blue-green-deployment/'
+                    } else {
+                        error("Invalid action: ${params.K8S_ACTION}")
+                    }
+                }
+            }
+        }
+    }
+}
