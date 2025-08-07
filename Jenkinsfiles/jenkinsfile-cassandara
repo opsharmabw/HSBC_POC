@@ -1,0 +1,31 @@
+pipeline {
+    agent any
+
+    environment {
+        GCLOUD_PROJECT = 'custom-sun-468208-s1'
+        GCP_REGION = 'asia-east2-a'
+        GKE_CLUSTER = 'gke-private-cluster'
+    }
+
+    stages {
+        stage('Authenticate with GCP') {
+            steps {
+                withCredentials([file(credentialsId: 'test', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                    sh '''
+                        gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
+                        gcloud config set project $GCLOUD_PROJECT
+                        gcloud container clusters get-credentials $GKE_CLUSTER --region $GCP_REGION
+                    '''
+                }
+            }
+        }
+        stage('kubectl get nodes') {
+            steps {
+                sh '''
+                    ls
+                    kubectl apply -f ./cassandra/
+                '''
+            }
+        }
+    }
+}
