@@ -3,7 +3,7 @@ pipeline {
 
   parameters {
     choice(name: 'TF_ACTION', choices: ['plan', 'apply', 'destroy'], description: 'Terraform action to perform')
-    string(name: 'TF_VARS_FILE', defaultValue: 'terraform.tfvars', description: 'Terraform variable file (e.g., dev.tfvars, prod.tfvars)')
+    string(name: 'TF_VARS_FILE', defaultValue: 'variables.tfvars', description: 'Terraform variable file (e.g., dev.tfvars, prod.tfvars)')
   }
 
   environment {
@@ -38,7 +38,10 @@ pipeline {
 
     stage('Terraform Plan') {
       when {
-        expression { params.TF_ACTION == 'plan' }
+        anyOf {
+          expression { params.TF_ACTION == 'plan' }
+          expression { params.TF_ACTION == 'apply' }
+        }
       }
       steps {
         dir("${env.TF_WORKING_DIR}") {
