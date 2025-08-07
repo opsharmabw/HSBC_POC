@@ -70,8 +70,10 @@ spec:
             - /bin/bash
             - -c
             - /ready-probe.sh
-          initialDelaySeconds: 15
-          timeoutSeconds: 5
+          initialDelaySeconds: 30
+          timeoutSeconds: 15
+          periodSeconds: 20
+          failureThreshold: 10
         volumeMounts:
         - name: cassandra-data
           mountPath: /cassandra_data
