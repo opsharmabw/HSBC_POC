@@ -11,3 +11,5 @@ master_ipv4_cidr         = "172.16.0.0/28"
 
 authorized_network_cidr  = "10.10.0.0/16"
 authorized_network_name  = "trusted-network"
+
+node_count = 3
