@@ -1,6 +1,6 @@
 terraform {
   backend "gcs" {
-    bucket  = "test-bucket-1-ommmsjnnmd"
+    bucket  = "my-gke-terraform-state"
     prefix  = "gke-private/terraform.tfstate"
   }
 }
