@@ -7,5 +7,5 @@ spec:
   - name: cassandra-client
     image: bitnami/cassandra:latest
     command: [ "sleep" ]
-    args: [ "3600" ]
+    args: [ "36000" ]
   restartPolicy: Never
